@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MineSense AI | Perception Health Command Center</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bootOverlay"><div id="bootLines"></div></div>
+<header class="topbar">
+  <div>
+    <div class="brand">MineSense <span>AI</span>
+  </div>
+  <p>Predictive Multi-Sensor Perception Health Command Center</p>
+</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div id="sourceBadge" class="source-tag">SOURCE: --</div>
+    <div class="live"><span class="dot"></span> LIVE ANALYSIS</div>
+  </div>
+</header>
+<main class="dashboard">
+<section class="hero-grid">
+  <div class="hero-card"><div class="eyebrow">VEHICLE READINESS</div><div class="hero-value"><span id="readinessScore">--</span><small>%</small></div><div id="readinessStatus" class="pill">CONNECTING</div><div class="progress"><div id="readinessBar"></div></div></div>
+  <div class="hero-card"><div class="eyebrow">FUSED PERCEPTION</div><div class="hero-value"><span id="fusionScore">--</span><small>%</small></div><div id="fusionStatus" class="pill">ANALYZING</div><p id="redundancyText">Redundancy: --</p></div>
+  <div class="hero-card"><div class="eyebrow">TIME TO CRITICAL</div><div class="hero-value compact"><span id="criticalTime">--</span><small> min</small></div><div id="riskStatus" class="pill">LOW RISK</div><p id="predictionText">Building temporal trend...</p></div>
+</section>
+<section class="panel" style="margin-top:18px"><div class="section-title"><div><h2>Readiness Trend</h2><p>Live history of readiness and fused perception confidence</p></div></div><div class="chart-wrap" style="height:220px"><canvas id="historyChart"></canvas></div></section>
+<section class="control-row"><div><h2>Operational Scenario</h2><p>Run controlled degradation and recovery cases for prototype validation.</p></div><select id="scenarioSelect">
+<option value="normal">Normal Operation</option><option value="dust_buildup">Dust Buildup</option><option value="vibration">High Vibration</option><option value="coupled" selected>Coupled Degradation</option><option value="fog">Fog / Low Visibility</option><option value="camera_failure">Camera Failure</option><option value="lidar_failure">LiDAR Failure</option><option value="radar_interference">Radar Interference</option><option value="recovery">Recovery</option>
+</select><div style="display:flex;align-items:center;gap:12px;margin-top:12px"><button id="guidedDemoBtn" class="pill" style="cursor:pointer;border:1px solid var(--cyan);background:rgba(47,230,255,.08)">▶ RUN GUIDED DEMO</button><span id="guidedDemoStatus" style="font-size:11.5px;color:var(--muted)"></span></div></section>
+<section><div class="section-title"><div><h2>Environmental &amp; Vehicle Conditions</h2><p>Context signals that can drive perception degradation</p></div><span id="lastUpdated">Waiting...</span></div><div class="sensor-grid" id="environmentGrid"></div></section>
+<section><div class="section-title"><div><h2>Perception Sensor Health</h2><p>Camera, LiDAR and radar quality metrics • synthetic prototype inputs</p></div><span class="source-tag">SIMULATED PERCEPTION</span></div><div class="perception-grid" id="perceptionGrid"></div></section>
+<section class="fusion-panel panel"><div class="section-title"><div><h2>Sensor Fusion &amp; Redundancy</h2><p>Multi-modal confidence and coverage assessment</p></div></div><div class="fusion-layout"><div class="fusion-nodes" id="fusionNodes"></div><div class="fusion-core"><div class="fusion-ring" id="fusionRing"><span id="fusionCenter">--%</span></div><b>FUSED PERCEPTION</b><small id="fusionLabel">Analyzing</small></div><div class="redundancy-box"><span class="eyebrow">REDUNDANCY</span><strong id="redundancyValue">--</strong><p id="redundancyDetail">--</p></div></div></section>
+<section class="analysis-grid"><div class="panel"><div class="section-title"><div><h2>Predictive Degradation</h2><p>Current vs projected sensor degradation</p></div></div><div class="chart-wrap"><canvas id="predictionChart"></canvas></div></div><div class="panel"><div class="section-title"><div><h2>Coupled Degradation Engine</h2><p>Environmental and perception channels degrading together</p></div></div><div id="coupledBadge" class="coupled-badge">NO COUPLING DETECTED</div><div class="coupled-score"><span id="coupledScore">0</span><small>%</small></div><div class="affected-label">Affected channels</div><div id="affectedSensors" class="chips"></div><p id="coupledExplanation">Waiting for analysis...</p></div></section>
+<section class="analysis-grid" style="margin-top:18px"><div class="panel"><div class="section-title"><div><h2>ML Degradation Model</h2><p>Gradient-boosted classifier trained on the synthetic degradation dataset</p></div><span class="source-tag" id="mlModelTag">MODEL: --</span></div><div class="recovery-stats" style="grid-template-columns:repeat(3,1fr)"><div><span>Predicted class</span><strong id="mlClass">--</strong></div><div><span>Confidence</span><strong id="mlConfidence">--</strong></div><div><span>Model accuracy</span><strong id="mlAccuracy">--</strong></div></div><p id="mlExplanation" style="margin-top:14px">Waiting for model output...</p></div><div class="panel"><div class="section-title"><div><h2>Feature Importance</h2><p>What the trained model weighs most heavily</p></div></div><div id="mlFeatures" class="chips"></div></div></section>
+<section class="lower-grid"><div class="panel"><div class="section-title"><div><h2>Recovery Intelligence</h2><p>Readiness restoration after degradation</p></div></div><div class="recovery-stats"><div><span>Status</span><strong id="recoveryStatus">--</strong></div><div><span>Recovery rate</span><strong id="recoveryRate">--</strong></div><div><span>Estimated recovery</span><strong id="recoveryTime">--</strong></div><div><span>Confidence</span><strong id="recoveryConfidence">--</strong></div></div><div class="recovery-note" id="recoveryNote">Recovery engine waiting for a recovery scenario.</div></div><div class="panel diagnostic"><div class="section-title"><div><h2>AI Diagnostic</h2><p>Why the system reached its current state</p></div></div><div id="diagnosticText">Waiting for analysis...</div></div></section>
+<section class="response-panel"><div><div class="eyebrow">RECOMMENDED OPERATIONAL RESPONSE</div><h2 id="responseTitle">System analysis in progress</h2><p id="responseText">The decision layer will recommend an action from current risk, coupling and perception confidence.</p></div><div class="response-action" id="responseAction">MONITOR</div></section>
+<section class="panel" style="margin-top:18px"><div class="section-title"><div><h2>Mission Log</h2><p>Narrated system events as they happen</p></div></div><div id="missionLog" class="mission-log"></div></section>
+<div id="connectionError" class="connection-error hidden">Cannot connect to the Python backend. Open the <code>backend</code> folder in VS Code and run <code>python app.py</code>.</div>
+<footer>MineSense AI prototype • Environmental inputs: live ESP32 hardware (temperature, dust, vibration, light) • Perception inputs: synthetic for prototype validation • Readiness computed by both a rule engine and a trained ML classifier • Not a safety-certified control system</footer>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script src="script.js"></script>
+</body></html>
