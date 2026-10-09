@@ -1,70 +1,83 @@
-import json
-import time
+import csv
+import os
 
-from simulator import SensorSimulator
-from anomaly_detector import AnomalyDetector
-from degradation_predictor import DegradationPredictor
-from coupled_degradation import detect_coupled_degradation
-from readiness_model import calculate_readiness
+from serial_reader import ESP32SerialReader
+from data_processor import process_sensor_data
+from sensor_health import calculate_sensor_health
+
+
+PORT = "COM7"
+BAUD_RATE = 115200
+
+CSV_FILE = "../data/sensor_readings.csv"
+
+
+def save_to_csv(data, health):
+    file_exists = os.path.exists(CSV_FILE)
+
+    os.makedirs("../data", exist_ok=True)
+
+    with open(CSV_FILE, "a", newline="") as file:
+        fieldnames = [
+            "timestamp",
+            "temperature",
+            "dust",
+            "motion",
+            "ldr",
+            "status",
+            "warnings"
+        ]
+
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow({
+            "timestamp": data["timestamp"],
+            "temperature": data["temperature"],
+            "dust": data["dust"],
+            "motion": data["motion"],
+            "ldr": data["ldr"],
+            "status": health["status"],
+            "warnings": "; ".join(health["warnings"])
+        })
 
 
 def main():
-    simulator = SensorSimulator()
-    detector = AnomalyDetector()
-    predictor = DegradationPredictor()
+    reader = ESP32SerialReader(PORT, BAUD_RATE)
+    reader.connect()
 
-    # Change this to test different situations:
-    # normal, dust_buildup, vibration, coupled, recovery
-    simulator.set_scenario("normal")
+    if reader.connection is None:
+        return
 
-    print("\nMINING SENSOR PREDICTIVE DEGRADATION SYSTEM")
-    print("=" * 55)
+    print("Waiting for sensor data...")
 
     try:
         while True:
-            reading = simulator.generate_reading()
+            raw_data = reader.read_data()
 
-            anomaly_scores = detector.analyze(reading)
+            if raw_data is not None:
+                processed_data = process_sensor_data(raw_data)
 
-            predictions = {}
+                if processed_data is not None:
+                    health = calculate_sensor_health(processed_data)
 
-            for sensor in [
-                "temperature",
-                "dust",
-                "motion",
-                "ldr"
-            ]:
-                predictions[sensor] = predictor.predict(
-                    sensor,
-                    reading[sensor],
-                    anomaly_scores[sensor]
-                )
+                    print("\nSensor data:")
+                    print(processed_data)
 
-            coupled_result = detect_coupled_degradation(
-                anomaly_scores,
-                predictions
-            )
+                    print("Health status:", health["status"])
 
-            readiness = calculate_readiness(
-                anomaly_scores,
-                coupled_result
-            )
+                    if health["warnings"]:
+                        print("Warnings:", health["warnings"])
 
-            output = {
-                "reading": reading,
-                "anomaly_scores": anomaly_scores,
-                "predictions": predictions,
-                "coupled_degradation": coupled_result,
-                "system_readiness": readiness
-            }
-
-            print(json.dumps(output, indent=2))
-            print("-" * 55)
-
-            time.sleep(1)
+                    save_to_csv(processed_data, health)
 
     except KeyboardInterrupt:
-        print("\nSystem stopped.")
+        print("\nStopping program...")
+
+    finally:
+        reader.close()
 
 
 if __name__ == "__main__":
